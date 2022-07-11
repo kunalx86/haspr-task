@@ -3,6 +3,9 @@ const express = require("express");
 const morgan = require("morgan");
 const { connect } = require("mongoose");
 
+const baseRouter = require("./routes/index");
+const { validateToken, decodeToken } = require("./utils/jwt");
+
 // To use .catch() & promises at top level
 (async () => {
   const app = express();
@@ -21,16 +24,33 @@ const { connect } = require("mongoose");
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // Routes
-  app.use("/api", (_, res) => {
-    res.json({
-      message: "Hello, World"
-    });
+  // If token exists save info in context
+  app.use(async (req, res, next) => {
+    req.ctx = {
+      isLoggedIn: false
+    }
+
+    try {
+      const token = (req.headers["authorization"] || "").split(" ")[2];
+      
+      if (token && token !== "" && (await validateToken(token))) { 
+        const ctx = await decodeToken(token);
+        req.ctx = {
+          ...ctx,
+          isLoggedIn: true
+        }
+      } 
+      next();
+    } catch (err) {
+      return next(err);
+    }
   });
 
+  // Routes
+  app.use('/api', baseRouter)
 
   // Top Level Error Manager
-  app.use((err, _, res) => {
+  app.use((err, _, res, next) => {
     return res.status(err.status || 500).json({
       message: err.message || "Something went wrong"
     });
