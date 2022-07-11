@@ -1,4 +1,4 @@
-const { register } = require("../utils/validationSchema");
+const { register, userInfo, userInfoModify } = require("../utils/validationSchema");
 
 const validator = (type) => {
   let validator = null;
@@ -9,6 +9,12 @@ const validator = (type) => {
       break;
     case "register":
       validator = register; 
+      break;
+    case "userInfo":
+      validator = userInfo;
+      break;
+    case "userInfoModify":
+      validator = userInfoModify;
       break;
     default:
       throw new Error("Validator type not recognized");

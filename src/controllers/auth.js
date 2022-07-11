@@ -14,6 +14,7 @@ const login = async (req, res, next) => {
 
     // Create and sign jwt token and send it    
     const token = await createAndSignToken({
+      _id: user._id.toString(),
       username: user.username,
       isAdmin: user.isAdmin
     });

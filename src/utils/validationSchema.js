@@ -6,6 +6,20 @@ const RegisterSchema = yup.object().shape({
   password: yup.string().required("Password is required")
 });
 
+
+const UserInfoSchema = yup.object().shape({
+  key: yup.string().required("Key is required"),
+  value: yup.string().required("Value is required")
+});
+
+const UserInfoListSchema = yup.object().shape({
+  data: yup.array().of(
+    UserInfoSchema
+  ).min(1).required("Data list is required"),
+})
+
 module.exports = {
-  register: RegisterSchema
-}
+  register: RegisterSchema,
+  userInfo: UserInfoListSchema,
+  userInfoModify: UserInfoSchema
+};
